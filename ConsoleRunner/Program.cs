@@ -10,7 +10,7 @@ namespace ConsoleRunner
             var basePath = "C:\\Users\\Admin\\Documents\\Visual Studio 2017\\Projects\\testFrameworkV0";
 
             var path = Path.Combine(basePath, "testFrameworkV0\\bin\\Debug");
-            var slnPath = Path.Combine(basePath, "testFrameworkV0\\testFrameworkV0.csproj");
+            var slnPath = Path.Combine(basePath, "testFrameworkV0.sln");
 
             Builder.Build(slnPath);
 
