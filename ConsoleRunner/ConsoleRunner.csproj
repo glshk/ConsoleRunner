@@ -101,7 +101,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runner.cs" />
     <Compile Include="Test.cs" />
-    <Compile Include="TestCaseFilter.cs" />
     <Compile Include="TestParser.cs" />
   </ItemGroup>
   <ItemGroup>

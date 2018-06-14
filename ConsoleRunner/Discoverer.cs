@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -10,9 +11,11 @@ namespace ConsoleRunner
 
         public static List<Test> DiscoverTests(string path, string testCaseFilter = null)
         {
+            Console.WriteLine("\r\n---Starting test discovery...---\r\n");
+
             if (!Directory.Exists(path))
             {
-                //Log.Error($"Tests assemblies directory '{path}' doesn't exist");
+                Console.WriteLine($"Tests assemblies directory '{path}' doesn't exist");
                 return _empty;
             }
 
@@ -21,7 +24,7 @@ namespace ConsoleRunner
 
             if (assemblies.Count == 0)
             {
-                //Log.Error($"No assemblies with tests were found at {path} directory");
+                Console.WriteLine($"No assemblies with tests were found at {path} directory");
                 return _empty;
             }
 
@@ -42,12 +45,12 @@ namespace ConsoleRunner
 
             if (tests.Count == 0)
             {
-                //Log.Error($"No tests were found inside of '{path}' directory");
+                Console.WriteLine($"No tests were found inside of '{path}' directory");
                 return _empty;
             }
 
-            //var testAssemblies = tests.Select(e => e.PathToAssembly).Distinct().Select(e => e);
-            //Log.Info(testAssemblies.FormatAsString("Test Assemblies:"));
+            var testAssemblies = tests.Select(e => e.PathToAssembly).Distinct().Select(e => e);
+            Console.WriteLine($"Test Assemblies:\r\n{string.Join("\r\n", testAssemblies)}\r\n");
 
             //if (string.IsNullOrWhiteSpace(testCaseFilter))
             //{
@@ -72,6 +75,8 @@ namespace ConsoleRunner
 
             //Log.Info($"Tests found '{filteredTests.Count}' after applying '{unescapedFilter}' filter. Total discovered tests without filter count: {uniqueTests.Count}");
             //return filteredTests;
+
+            Console.WriteLine($"\r\n---Total discovered tests without filter count: {uniqueTests.Count}---\r\n");
             return uniqueTests;
         }
     }
