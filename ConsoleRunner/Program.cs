@@ -14,14 +14,15 @@ namespace ConsoleRunner
 
             Builder.PrepareSources(basePath);
 
-            var discoveredTests = Discoverer.DiscoverTests(Directory.GetCurrentDirectory());
-            var testToTest = discoveredTests.First(test => test.TestMethod.Name.Equals("Test1"));
-            Runner.run(testToTest);
+            //var discoveredTests = Discoverer.DiscoverTests(Directory.GetCurrentDirectory());
+            //var testToTest = discoveredTests.First(test => test.TestMethod.Name.Equals("Test1"));
+            //Runner.run(testToTest);
 
-            //foreach (var test in Discoverer.DiscoverTests(path))
-            //{
-            //    Runner.run(test);
-            //}
+            var path = Directory.GetCurrentDirectory();
+            foreach (var test in Discoverer.DiscoverTests(path))
+            {
+                Runner.run(test);
+            }
         }
     }
 }
