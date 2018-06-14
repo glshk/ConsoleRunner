@@ -14,8 +14,9 @@ namespace ConsoleRunner
 
             Builder.PrepareSources(basePath);
 
-            Runner.run(Discoverer.DiscoverTests(Directory.GetCurrentDirectory()).First(test 
-                => test.TestMethod.Name.Equals("TestFullDriver")));
+            var discoveredTests = Discoverer.DiscoverTests(Directory.GetCurrentDirectory());
+            var testToTest = discoveredTests.First(test => test.TestMethod.Name.Equals("Test1"));
+            Runner.run(testToTest);
 
             //foreach (var test in Discoverer.DiscoverTests(path))
             //{

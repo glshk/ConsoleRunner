@@ -14,41 +14,38 @@ namespace ConsoleRunner
             //new NUnitCategory();
         }
 
-        public IList<Test> GetTests(string testAssemblyPath)
-        {
-            return GetTests(testAssemblyPath, typeof(TestFixtureAttribute), typeof(TestAttribute));
-        }
+        public IList<Test> GetTests(string testAssemblyPath) 
+            => GetTests(testAssemblyPath, typeof(TestFixtureAttribute), typeof(TestAttribute));
 
-        public bool HasTests(string testAssemblyPath)
-        {
-            return HasTests(testAssemblyPath, typeof(TestFixtureAttribute), typeof(TestAttribute));
-        }
+        public bool HasTests(string testAssemblyPath) 
+            => HasTests(testAssemblyPath, typeof(TestFixtureAttribute), typeof(TestAttribute));
 
-        IList<Test> GetTests(string testAssemblyPath, Type testFixtureAttr, Type testAttr)
-        {
-            List<MethodInfo> testMethods = GetTestMethods(testAssemblyPath, testFixtureAttr, testAttr).ToList();
-            return GetTestsFromMethodInfo(testMethods, testAssemblyPath, testFixtureAttr);
-        }
+        IList<Test> GetTests(string testAssemblyPath, Type testFixtureAttr, Type testAttr) 
+            => GetTestsFromMethodInfo(GetTestMethods(testAssemblyPath, testFixtureAttr, testAttr).ToList(), 
+                    testAssemblyPath, testFixtureAttr);
 
-        List<Test> GetTestsFromMethodInfo(List<MethodInfo> testMethods, string testAssemblyPath, Type testFixtureAttr, bool isParametrized = false)
-        {
-            return testMethods.Select(m =>
-                new Test
-                {
-                    TestMethod = m,
-                    Name = GetMethodFullName(m),
-                    PathToAssembly = testAssemblyPath,
-                    ClassName = m.DeclaringType.FullName,
-                    TestType = GetTestType(testFixtureAttr),
-                    IsIgnored = IsTestMethodIgnored(m)
-                }
-            ).ToList();
-        }
+        MethodInfo GetHelperMethod(string testAssemblyPath, Type testFixtureAttr, MethodInfo testMethod, Type attribute) 
+            => GetTestFixtures(testAssemblyPath, testFixtureAttr)
+                    .Single(f => f.FullName == testMethod.DeclaringType.FullName)
+                    .GetMethods().Single(method => method.GetCustomAttributesData()
+                        .Any(attr => attr.AttributeType.FullName == attribute.FullName));
 
-        bool IsTestMethodIgnored(MethodInfo methodInfo)
-        {
-            return methodInfo.CustomAttributes.Any(e => e.AttributeType.Name.Equals("IgnoreAttribute"));
-        }
+        List<Test> GetTestsFromMethodInfo(List<MethodInfo> testMethods, string testAssemblyPath, Type testFixtureAttr, bool isParametrized = false) 
+            => testMethods.Select(m =>
+                    new Test
+                    {
+                        TestMethod = m,
+                        Before = GetHelperMethod(testAssemblyPath, testFixtureAttr, m, typeof(SetUpAttribute)),
+                        After = GetHelperMethod(testAssemblyPath, testFixtureAttr, m, typeof(TearDownAttribute)),
+                        Name = GetMethodFullName(m),
+                        PathToAssembly = testAssemblyPath,
+                        ClassName = m.DeclaringType.FullName,
+                        TestType = GetTestType(testFixtureAttr),
+                        IsIgnored = IsTestMethodIgnored(m)
+                    }).ToList();
+
+        bool IsTestMethodIgnored(MethodInfo methodInfo) 
+            => methodInfo.CustomAttributes.Any(e => e.AttributeType.Name.Equals("IgnoreAttribute"));
 
         TestTypes GetTestType(Type attr)
         {
@@ -65,17 +62,14 @@ namespace ConsoleRunner
             throw new NotSupportedException(string.Format("Attribute {0} is not a valid unit test type attribute.", attr.FullName));
         }
 
-        string GetMethodFullName(MethodInfo m)
-        {
-            return string.Format("{0}.{1}", m.DeclaringType.FullName, m.Name);
-        }
+        string GetMethodFullName(MethodInfo m) 
+            => string.Format("{0}.{1}", m.DeclaringType.FullName, m.Name);
 
-        IEnumerable<MethodInfo> GetTestMethods(string testAssemblyPath, Type testFixtureAttr, Type testAttr)
-        {
-            IEnumerable<Type> testFixtures = GetTestFixtures(testAssemblyPath, testFixtureAttr);
-            IEnumerable<MethodInfo> methods = testFixtures.SelectMany(f => f.GetMethods());
-            return methods.Where(method => method.GetCustomAttributesData().Any(attribute => attribute.AttributeType.FullName == testAttr.FullName));
-        }
+        IEnumerable<MethodInfo> GetTestMethods(string testAssemblyPath, Type testFixtureAttr, Type testAttr) 
+            => GetTestFixtures(testAssemblyPath, testFixtureAttr)
+                    .SelectMany(f => f.GetMethods())
+                    .Where(method => method.GetCustomAttributesData()
+                        .Any(attribute => attribute.AttributeType.FullName == testAttr.FullName));
 
         IEnumerable<Type> GetTestFixtures(string testAssemblyPath, Type testFixtureAttr)
         {
@@ -90,7 +84,6 @@ namespace ConsoleRunner
         Assembly LoadAssembly(string testAssemblyPath)
         {
             var testParser = new TestParser();
-            //List<string> assembliesFullPath = testParser.GetTestAssemblyPaths(testAssemblyPath);
             List<string> assembliesFullPath = testParser.GetTestAssemblyPaths(Directory.GetParent(testAssemblyPath).FullName);
 
             Assembly assembly = null;
@@ -177,10 +170,10 @@ namespace ConsoleRunner
             return types;
         }
 
-        bool HasTests(string testAssemblyPath, Type testFixtureAttr, Type testAttr)
-        {
-            return GetTestFixtures(testAssemblyPath, testFixtureAttr).Any(fixture => fixture.GetMethods().Any(method => method.GetCustomAttributesData().Any(attribute => attribute.AttributeType.FullName == testAttr.FullName)));
-        }
-
+        bool HasTests(string testAssemblyPath, Type testFixtureAttr, Type testAttr) 
+            => GetTestFixtures(testAssemblyPath, testFixtureAttr)
+                    .Any(fixture => fixture.GetMethods()
+                        .Any(method => method.GetCustomAttributesData()
+                            .Any(attribute => attribute.AttributeType.FullName == testAttr.FullName)));
     }
 }

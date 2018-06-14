@@ -13,19 +13,14 @@ namespace ConsoleRunner
             _parsers = new List<IParseTests>
             {
                 new NUnitTestParser(),
-                //new NUnitTestCaseParser(),
                 //new MsTestParser()
             };
         }
 
-        public List<string> GetTestAssemblyPaths(string testAssemblyDirectory)
-        {
-            return Directory.GetFiles(Path.Combine(testAssemblyDirectory), "*.dll", SearchOption.AllDirectories).ToList();
-        }
+        public List<string> GetTestAssemblyPaths(string testAssemblyDirectory) 
+            => Directory.GetFiles(Path.Combine(testAssemblyDirectory), "*.dll", SearchOption.AllDirectories).ToList();
 
-        public List<Test> GetTests(IList<string> testAssemblyPaths)
-        {
-            return testAssemblyPaths.SelectMany(path => _parsers.SelectMany(parser => parser.GetTests(path))).ToList();
-        }
+        public List<Test> GetTests(IList<string> testAssemblyPaths) 
+            => testAssemblyPaths.SelectMany(path => _parsers.SelectMany(parser => parser.GetTests(path))).ToList();
     }
 }

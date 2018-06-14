@@ -6,6 +6,10 @@ namespace ConsoleRunner
     {
         internal MethodInfo TestMethod;
 
+        internal MethodInfo Before;
+
+        internal MethodInfo After;
+
         public string Name { get; set; }
 
         public string PathToAssembly { get; set; }

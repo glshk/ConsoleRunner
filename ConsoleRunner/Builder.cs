@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Execution;
 using Microsoft.Build.Framework;
@@ -22,6 +24,10 @@ namespace ConsoleRunner
 
         internal static void PrepareSources(string path)
         {
+            //foreach (var process in new[] { "IEDriverServer", "geckodriver", "chromedriver" })
+            //    Process.GetProcessesByName(process).ToList()
+            //        .ForEach(proc => proc.Kill());
+
             var slnName = Path.GetFileName(path);
             Build(Path.ChangeExtension(Path.Combine(path, slnName), "sln"));
 

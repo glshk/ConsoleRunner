@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace ConsoleRunner
 {
@@ -6,8 +8,13 @@ namespace ConsoleRunner
     {
         public static void run(Test test)
         {
-            test.TestMethod.Invoke(Activator.CreateInstance(test.TestMethod.DeclaringType), null);
-
+            var instance = Activator.CreateInstance(test.TestMethod.DeclaringType);
+            new List<MethodInfo>
+            {
+                test.Before,
+                test.TestMethod,
+                test.After
+            }.ForEach(method => method.Invoke(instance, null));
         }
     }
 }
