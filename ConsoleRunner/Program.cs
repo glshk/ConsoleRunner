@@ -7,19 +7,20 @@ namespace ConsoleRunner
     {
         static void Main(string[] args)
         {
-            var basePath = "C:\\Users\\Admin\\Documents\\Visual Studio 2017\\Projects\\testFrameworkV0";
+            //specify test solution file
+            var slnPath = Path.GetFullPath(
+                "C:\\Users\\Admin\\Documents\\Visual Studio 2017\\Projects\\testFrameworkV0\\testFrameworkV0.sln");
+            var basePath = Directory.GetParent(slnPath).FullName;
 
-            var path = Path.Combine(basePath, "testFrameworkV0\\bin\\Debug");
-            var slnPath = Path.Combine(basePath, "testFrameworkV0.sln");
+            Builder.PrepareSources(basePath);
 
-            Builder.Build(slnPath);
+            Runner.run(Discoverer.DiscoverTests(Directory.GetCurrentDirectory()).First(test 
+                => test.TestMethod.Name.Equals("TestFullDriver")));
 
-            Runner.run(Discoverer.DiscoverTests(path).First(test => test.TestMethod.Name.Equals("TestFull")));
-
-            foreach (var test in Discoverer.DiscoverTests(path))
-            {
-                Runner.run(test);
-            }
+            //foreach (var test in Discoverer.DiscoverTests(path))
+            //{
+            //    Runner.run(test);
+            //}
         }
     }
 }

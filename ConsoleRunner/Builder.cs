@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.IO;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Execution;
 using Microsoft.Build.Framework;
@@ -19,5 +19,18 @@ namespace ConsoleRunner
                     "15.0", 
                     new[] {"Build"},
                     null));
+
+        internal static void PrepareSources(string path)
+        {
+            var slnName = Path.GetFileName(path);
+            Build(Path.ChangeExtension(Path.Combine(path, slnName), "sln"));
+
+            string currentFile(string fileToCopy) 
+                => Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileName(fileToCopy));
+
+            foreach (var file in Directory.GetFiles(Path.Combine(path, slnName, "bin\\Debug")))
+                //if (!File.Exists(currentFile(file)))
+                    File.Copy(file, currentFile(file), true);
+        }
     }
 }
